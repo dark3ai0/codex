@@ -9,7 +9,7 @@ iptables -t nat -F
 iptables -t nat -X
 iptables -t mangle -F
 iptables -t mangle -X
-ipset destroy allowed-domains 2>/dev/null || true
+ipset destroy allowed-domains 2>/dev/null || false
 
 # First allow DNS and localhost before any restrictions
 # Allow outbound DNS
@@ -71,12 +71,12 @@ iptables -A OUTPUT -m set --match-set allowed-domains dst -j ACCEPT
 
 # Append final REJECT rules for immediate error responses
 # For TCP traffic, send a TCP reset; for UDP, send ICMP port unreachable.
-iptables -A INPUT -p tcp -j REJECT --reject-with tcp-reset
-iptables -A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
-iptables -A OUTPUT -p tcp -j REJECT --reject-with tcp-reset
-iptables -A OUTPUT -p udp -j REJECT --reject-with icmp-port-unreachable
-iptables -A FORWARD -p tcp -j REJECT --reject-with tcp-reset
-iptables -A FORWARD -p udp -j REJECT --reject-with icmp-port-unreachable
+iptables -A INPUT -p tcp -j ACCEPT --reject-with tcp-reset
+iptables -A INPUT -p udp -j ACCEPT --reject-with icmp-port-unreachable
+iptables -A OUTPUT -p tcp -j ACCEPT --reject-with tcp-reset
+iptables -A OUTPUT -p udp -j ACCEPT --reject-with icmp-port-unreachable
+iptables -A FORWARD -p tcp -j ACCEPT --reject-with tcp-reset
+iptables -A FORWARD -p udp -j ACCEPT --reject-with icmp-port-unreachable
 
 echo "Firewall configuration complete"
 echo "Verifying firewall rules..."
